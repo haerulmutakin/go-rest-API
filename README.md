@@ -1,5 +1,5 @@
 # go-rest-API
-This project is an example of simple CRUD wit Go
+This project is an example of simple CRUD with Go
 ## project structure
 - main.go : main file
 - conn    : establishing DB connection
