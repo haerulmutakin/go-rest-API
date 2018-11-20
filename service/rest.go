@@ -2,17 +2,15 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"restapi/conn"
-
-	"github.com/gorilla/mux"
 )
 
 // User struct
 type User struct {
-	ID   string `json:"id"`
-	NAME string `json:"username"`
+	ID       string `json:"id"`
+	NAME     string `json:"username"`
+	PASSWORD string `json:"password"`
 }
 
 // GetUsers func
@@ -40,21 +38,24 @@ func GetUsers(rWriter http.ResponseWriter, req *http.Request) {
 
 // CreateUser func
 func CreateUser(rWriter http.ResponseWriter, req *http.Request) {
+	id := req.FormValue("id")
+	name := req.FormValue("name")
+	password := req.FormValue("password")
 	db := connection.ConnectToDb()
-	insert, err := db.Query(" INSERT INTO users VALUES(5, 'MUTAKIN', 'password')")
+	insert, err := db.Prepare("INSERT INTO users (id, username, password) VALUES(?,?,?)")
 	if err != nil {
 		panic(err.Error())
 	}
 
-	defer insert.Close()
+	insert.Exec(id, name, password)
+
+	defer db.Close()
 }
 
 // GetUser func
 func GetUser(rWriter http.ResponseWriter, req *http.Request) {
+	userID := req.URL.Query().Get("id")
 	db := connection.ConnectToDb()
-	params := mux.Vars(req)
-	userID := params["id"]
-	fmt.Println(userID)
 	results, err := db.Query("SELECT id, username FROM users WHERE id=?", userID)
 	if err != nil {
 		panic(err.Error())
