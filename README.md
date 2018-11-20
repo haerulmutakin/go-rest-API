@@ -8,3 +8,5 @@ This project is an example of simple CRUD wit Go
 ## libraries
 - [Gorilla/mux](https://github.com/gorilla/mux)
 - [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
+## DB source
+This project using local DB
