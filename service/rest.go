@@ -36,22 +36,6 @@ func GetUsers(rWriter http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(rWriter).Encode(users)
 }
 
-// CreateUser func
-func CreateUser(rWriter http.ResponseWriter, req *http.Request) {
-	id := req.FormValue("id")
-	name := req.FormValue("name")
-	password := req.FormValue("password")
-	db := connection.ConnectToDb()
-	insert, err := db.Prepare("INSERT INTO users (id, username, password) VALUES(?,?,?)")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	insert.Exec(id, name, password)
-
-	defer db.Close()
-}
-
 // GetUser func
 func GetUser(rWriter http.ResponseWriter, req *http.Request) {
 	userID := req.URL.Query().Get("id")
@@ -74,4 +58,57 @@ func GetUser(rWriter http.ResponseWriter, req *http.Request) {
 		users = append(users, User{ID: id, NAME: username})
 	}
 	json.NewEncoder(rWriter).Encode(users)
+}
+
+// CreateUser func
+func CreateUser(rWriter http.ResponseWriter, req *http.Request) {
+	id := req.FormValue("id")
+	name := req.FormValue("name")
+	password := req.FormValue("password")
+
+	db := connection.ConnectToDb()
+
+	insert, err := db.Prepare("INSERT INTO users (id, username, password) VALUES(?,?,?)")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	insert.Exec(id, name, password)
+
+	defer db.Close()
+}
+
+// UpdateUser func
+func UpdateUser(rWriter http.ResponseWriter, req *http.Request) {
+	id := req.FormValue("id")
+	name := req.FormValue("name")
+	password := req.FormValue("password")
+
+	db := connection.ConnectToDb()
+
+	update, err := db.Prepare("UPDATE users SET username=?, password=? WHERE id=?")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	update.Exec(name, password, id)
+
+	defer db.Close()
+
+}
+
+// DeleteUser func
+func DeleteUser(rWriter http.ResponseWriter, req *http.Request) {
+	userID := req.URL.Query().Get("id")
+
+	db := connection.ConnectToDb()
+
+	delete, err := db.Prepare("DELETE from users WHERE id=?")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	delete.Exec(userID)
+
+	defer db.Close()
 }
