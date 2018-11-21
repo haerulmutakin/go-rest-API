@@ -13,27 +13,38 @@ type User struct {
 	PASSWORD string `json:"password"`
 }
 
+// Body struct
+type Body struct {
+	COUNT int    `json:"count"`
+	DATA  []User `json:"data"`
+}
+
 // GetUsers func
 func GetUsers(rWriter http.ResponseWriter, req *http.Request) {
+	rWriter.Header().Set("Content-Type", "application/json")
+
 	db := connection.ConnectToDb()
-	results, err := db.Query("SELECT id, username FROM users")
+	results, err := db.Query("SELECT * FROM users")
 	if err != nil {
 		panic(err.Error())
 	}
-
 	var id string
 	var username string
+	var password string
 	var users []User
 
 	for results.Next() {
-		err = results.Scan(&id, &username)
+		err = results.Scan(&id, &username, &password)
 		if err != nil {
 			panic(err.Error())
 		}
-
-		users = append(users, User{ID: id, NAME: username})
+		users = append(users, User{ID: id, NAME: username, PASSWORD: password})
 	}
-	json.NewEncoder(rWriter).Encode(users)
+
+	body := new(Body)
+	body.COUNT = len(users)
+	body.DATA = users
+	json.NewEncoder(rWriter).Encode(body)
 }
 
 // GetUser func
